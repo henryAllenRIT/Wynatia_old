@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfeeab43ab2904e2ea4b81b0f38048e3, type: 3}
+  m_Name: Pebble
+  m_EditorClassIdentifier: 
+  itemName: Pebble
+  type: 12
+  effect: 0
+  itemLevel: 0
+  value: 0
+  worldObject: {fileID: 7004717788198696792, guid: b668b47a24ef8485a9401f69518a7c31,
+    type: 3}
+  description: A small stone.
+  twoHanded: 0
+  meleeWeaponScriptableObject: {fileID: 0}
+  rangedWeaponScriptableObject: {fileID: 0}
+  ammunitionScriptableObject: {fileID: 11400000, guid: e9c380cd2453d4be988f851c4d0c02d2,
+    type: 2}

@@ -1,7 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -30,6 +31,81 @@ public class PlayerInventory : MonoBehaviour
         West,
         None
     }
+[System.Serializable]
+    public class GearWheelSlot{
+        public InventoryItem item1;
+        public InventoryItem item2;
+        public InventoryItem item3;
+        public InventoryItem item4;
+
+        private List<InventoryItem> itemsIndexed;
+
+        public bool Contains(InventoryItem i){
+            if(item1 == i)
+                return true;
+            else if(item2 == i)
+                return true;
+            else if(item3 == i)
+                return true;
+            else if(item4 == i)
+                return true;
+            else
+                return false;
+        }
+
+        public void RemoveItem(InventoryItem i){
+            if(item1 == i)
+                item1 = null;
+            else if(item2 == i)
+                item2 = null;
+            else if(item3 == i)
+                item3 = null;
+            else if(item4 == i)
+                item4 = null;
+        }
+
+        public GearWheelSlot(InventoryItem i = null, InventoryItem ii = null, InventoryItem iii = null, InventoryItem iv = null){
+            item1 = i;
+            item2 = ii;
+            item3 = iii;
+            item4 = iv;
+
+            itemsIndexed = new List<InventoryItem>() { item1, item2, item3, item4};
+        }
+
+        public List<InventoryItem> GetItems(){
+            itemsIndexed = new List<InventoryItem>() { item1, item2, item3, item4};
+
+            return itemsIndexed;
+        }
+
+        public bool Empty(){
+            // if(item1 != null){
+                if(item1.count != 0)
+                    return false;
+                // else if(item2 != null)
+                //     return false;
+                // else if(item3 != null)
+                //     return false;
+                // else if(item4 != null)
+                //     return false;
+            // }
+
+            return true;
+        }
+
+        public void AddItem(InventoryItem itemToAdd){
+            if(item1.sObj == null)
+                item1 = itemToAdd;
+            else if(item2.sObj == null)
+                item2 = itemToAdd;
+            else if(item3.sObj == null)
+                item3 = itemToAdd;
+            else if (item4.sObj == null)
+                item4 = itemToAdd;
+            
+        }
+    }
 
     #endregion
     
@@ -41,6 +117,7 @@ public class PlayerInventory : MonoBehaviour
     public ItemInspector itemInspector;
     public DropItemMenu dropItemMenu;
     public ItemInfoPanel itemInfo;
+    public TextAssigner currencyTextAssigner;
 #endregion
 
 #region  Component References
@@ -110,9 +187,12 @@ public class PlayerInventory : MonoBehaviour
     private InventoryItem selectedItem;
     [SerializeField]
     private List<Item> equippedItems = new List<Item>();
+    [SerializeField]
     private List<WorldItem> worldItemsInRange = new List<WorldItem>();
+    [SerializeField]
     private WorldItem hoveredItem;
-    [SerializeField] private List<InventoryItem> northItems = new List<InventoryItem>();
+    // [SerializeField] private List<InventoryItem> northItems = new List<InventoryItem>();
+    [SerializeField] private List<GearWheelSlot> northItems = new List<GearWheelSlot>();
     private List<InventoryItem> eastItems = new List<InventoryItem>();
     private List<InventoryItem> southItems = new List<InventoryItem>();
     private List<InventoryItem> westItems = new List<InventoryItem>();
@@ -147,16 +227,14 @@ public class PlayerInventory : MonoBehaviour
     void Update(){
         if(worldItemsInRange.Count > 0 && !Pause.PauseManagement.paused){
             RaycastHit hit;
-            if(Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, pickupItemDistance, worldItemLayerMask)){
-                if(hit.collider.gameObject.TryGetComponent<WorldItem>(out WorldItem w))
+            if(Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, pickupItemDistance, worldItemLayerMask, QueryTriggerInteraction.Ignore)){
+                
+                // Debug.Log(hit.collider.name);
+                WorldItem w;
+                if(hit.collider.gameObject.TryGetComponent<WorldItem>(out w))
                     hoveredItem = w;
                 else{
-                    if(hit.transform.parent.TryGetComponent<WorldItem>(out w)){
-                        hoveredItem = w;
-                    }
-                    else{
-                        Debug.LogError("Collider player inventory raycasted for is too deeply nested in the item's GameObject.");
-                    }
+                    hoveredItem = hit.collider.transform.GetComponentInParent<WorldItem>();
                 }
                 if(hoveredItem.quantity > 1){
                     pickupItemText.SetText(hoveredItem.scriptableObject.itemName + "(" + hoveredItem.quantity + ")");
@@ -183,6 +261,7 @@ public class PlayerInventory : MonoBehaviour
 
     // Called from WorldItem script
     public void StartItemRaycast(WorldItem w){
+        worldItemsInRange.Clear();
         worldItemsInRange.Add(w);
     }
 
@@ -234,349 +313,426 @@ public class PlayerInventory : MonoBehaviour
     #region Gear Wheel
 
     void CheckWhichWheelIsOpen(){
-        if(gearWheel.activeSelf){
-            CloseGearWheel(GearWheelSegment.None);
-        }
-        else if(assignGearWheel.activeSelf){
-            CloseAssignGearWheel();
-        }
+        // if(gearWheel.activeSelf){
+        //     CloseGearWheel(GearWheelSegment.None);
+        // }
+        // else if(assignGearWheel.activeSelf){
+        //     CloseAssignGearWheel();
+        // }
     }
 
     // Called via PlayerInput component's broadcasts
     void OpenGearWheel(){
-        List<TextMeshProUGUI> pertinentTextObjects;
+        // List<TextMeshProUGUI> pertinentTextObjects;
         
-        // Setup each gear wheel segment
-        pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[0], northItemTextObjects[2]};
-        SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
-        // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemText, eastItemRoom);
-        // SetupGearWheelSegment(southItems, southSelectedIndex, southItemText, southItemRoom);
-        // SetupGearWheelSegment(westItems, westSelectedIndex, westItemText, westItemRoom);
+        // // Setup each gear wheel segment
+        // pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[0], northItemTextObjects[2]};
+        // SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
+        // // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemText, eastItemRoom);
+        // // SetupGearWheelSegment(southItems, southSelectedIndex, southItemText, southItemRoom);
+        // // SetupGearWheelSegment(westItems, westSelectedIndex, westItemText, westItemRoom);
         
-        foreach(Toggle toggle in gearWheelSegments){
-            toggle.isOn = false;
-        }
+        // foreach(Toggle toggle in gearWheelSegments){
+        //     toggle.isOn = false;
+        // }
         
-        // Show the gear wheel
-        gearWheel.SetActive(true);
-        // Slow time
-        previousTimeScale = Time.timeScale;
-        Time.timeScale = 0.5f;
-        // Disable unwanted actions
-        playerInput.actions["Sheathe Weapon"].Disable();
-        playerInput.actions["Attack"].Disable();
-        playerInput.actions["Off-Hand Attack"].Disable();
-        playerInput.actions["Inventory"].Disable();
-        playerInput.actions["Interact"].Disable();
-        playerInput.actions["menu"].Disable();
-        playerInput.actions["look"].Disable();
-        playerInput.actions["Melee Power Attack"].Disable();
-        playerInput.actions["Melee Off-Hand Power Attack"].Disable();
-        playerInput.actions["Ranged Attack"].Disable();
-        playerInput.actions["Cancel Ranged Attack"].Disable();
+        // // Show the gear wheel
+        // gearWheel.SetActive(true);
+        // // Slow time
+        // previousTimeScale = Time.timeScale;
+        // Time.timeScale = 0.5f;
+        // // Disable unwanted actions
+        // playerInput.actions["Sheathe Weapon"].Disable();
+        // playerInput.actions["Attack"].Disable();
+        // playerInput.actions["Off-Hand Attack"].Disable();
+        // playerInput.actions["Inventory"].Disable();
+        // playerInput.actions["Interact"].Disable();
+        // playerInput.actions["menu"].Disable();
+        // playerInput.actions["look"].Disable();
+        // playerInput.actions["Melee Power Attack"].Disable();
+        // playerInput.actions["Melee Off-Hand Power Attack"].Disable();
+        // playerInput.actions["Ranged Attack"].Disable();
+        // playerInput.actions["Cancel Ranged Attack"].Disable();
 
-        // Enable cancel gear wheel
-        playerInput.actions["Cancel Gear Wheel"].Enable();
-        playerInput.actions["Navigate Gear Wheel"].Enable();
+        // // Enable cancel gear wheel
+        // playerInput.actions["Cancel Gear Wheel"].Enable();
+        // playerInput.actions["Navigate Gear Wheel"].Enable();
         
-        mousePosition = Vector2.zero;
+        // mousePosition = Vector2.zero;
 
 
     }
 
     // Item Text list elements: Element 0: item name text (for whichever wheel is active), Element 1: segment item count text
-    void SetupGearWheelSegment(List<InventoryItem> segmentItems, int selectedIndex, List<TextMeshProUGUI> itemText, Transform itemRoom){
-        // If no items in segment, display grayed out text saying "No items assigned"
-        foreach(Transform child in itemRoom){
-            Destroy(child.gameObject);
-        }
+    void SetupGearWheelSegment(List<GearWheelSlot> segmentItems, int selectedIndex, List<TextMeshProUGUI> itemText, Transform itemRoom){ // List<InventoryItem> segmentItems
+        // // If no items in segment, display grayed out text saying "No items assigned"
+        // foreach(Transform child in itemRoom){
+        //     Destroy(child.gameObject);
+        // }
         
-        if(segmentItems.Count == 0){
-            itemText[0].color = Color.gray;
-            itemText[0].text = "No items assigned";
-            itemText[1].text = "0/8";
-        }
-        else{
-            itemText[0].color = Color.white;
-            itemText[0].text = segmentItems[selectedIndex].sObj.itemName + " (" + segmentItems[selectedIndex].count + ")";
-            itemText[1].text = segmentItems.Count + "/8";
+        // if(segmentItems.Count == 0){
+        //     itemText[0].color = Color.gray;
+        //     itemText[0].text = "No items assigned";
+        //     itemText[1].text = "0/8";
+        // }
+        // else if(segmentItems[0].Empty()){
+        //     itemText[0].color = Color.gray;
+        //     itemText[0].text = "No items assigned";
+        //     itemText[1].text = "0/8";
+        // }
+        // else{
+        //     itemText[0].color = Color.white;
 
+        //     string assignedItems = "";
+
+        //     foreach (var item in segmentItems[selectedIndex].GetItems())
+        //     {
+        //         if(item.sObj != null){
+        //             if(assignedItems == ""){
+        //                 assignedItems += item.sObj.itemName;
+        //                 if(item.count > 1)
+        //                     assignedItems += " (" + item.count + ")";
+        //             }
+        //             else
+        //                 assignedItems += "/" + item.sObj.itemName;
+        //                 if(item.count > 1)
+        //                     assignedItems += " (" + item.count + ")";
+        //         }
+        //     }
+
+        //     itemText[0].text = assignedItems;
+        //     itemText[1].text = segmentItems.Count + "/8";
+
+        //     if(segmentItems[selectedIndex].GetItems().Count > 1){
+        //         // TODO Instantiate so that items won't overlap 
+        //     }
+        //     else{
+        //         GameObject itemModel = Instantiate(segmentItems[selectedIndex].item1.gObj, itemRoom.position, itemRoom.rotation, itemRoom);
+        //         itemModel.GetComponent<WorldItem>().instanceKinematic = true;
+        //         Destroy(itemModel.GetComponent<WorldItem>());
+        //         itemModel.GetComponent<Rigidbody>().isKinematic = true;
+        //     }
             
-            GameObject itemModel = Instantiate(segmentItems[selectedIndex].gObj, itemRoom.position, itemRoom.rotation, itemRoom);
-            itemModel.GetComponent<WorldItem>().instanceKinematic = true;
-            Destroy(itemModel.GetComponent<WorldItem>());
-            itemModel.GetComponent<Rigidbody>().isKinematic = true;
 
-        }
+        // }
     }
     
     void OnNavigateGearWheel(){
 
-        Vector2 input = playerInput.actions["Navigate Gear Wheel"].ReadValue<Vector2>();
-        if(Mathf.Abs(mousePosition.x + input.x) < 20){
-            mousePosition.x += input.x;
-        }
-        if(Mathf.Abs(mousePosition.y + input.y) < 20){
-            mousePosition.y += input.y;
-        }
+        // Vector2 input = playerInput.actions["Navigate Gear Wheel"].ReadValue<Vector2>();
+        // if(Mathf.Abs(mousePosition.x + input.x) < 20){
+        //     mousePosition.x += input.x;
+        // }
+        // if(Mathf.Abs(mousePosition.y + input.y) < 20){
+        //     mousePosition.y += input.y;
+        // }
 
-        debugArrow.right = mousePosition;
+        // debugArrow.right = mousePosition;
 
-        float arrowRot = debugArrow.eulerAngles.z;
+        // float arrowRot = debugArrow.eulerAngles.z;
 
-        GearWheelSegment closestSegment = GearWheelSegment.North;
+        // GearWheelSegment closestSegment = GearWheelSegment.North;
         
-        if(arrowRot >= 45 && arrowRot < 135){
-            // North
-            closestSegment = GearWheelSegment.North;
-        }
-        else if(arrowRot >= 0 && arrowRot < 45 || arrowRot >= 315){
-            // East
-            closestSegment = GearWheelSegment.East;
-        }
-        else if(arrowRot >= 225 && arrowRot < 315){
-            // South
-            closestSegment = GearWheelSegment.South;
-        }
-        else{
-            // West
-            closestSegment = GearWheelSegment.West;
-        }
+        // if(arrowRot >= 45 && arrowRot < 135){
+        //     // North
+        //     closestSegment = GearWheelSegment.North;
+        // }
+        // else if(arrowRot >= 0 && arrowRot < 45 || arrowRot >= 315){
+        //     // East
+        //     closestSegment = GearWheelSegment.East;
+        // }
+        // else if(arrowRot >= 225 && arrowRot < 315){
+        //     // South
+        //     closestSegment = GearWheelSegment.South;
+        // }
+        // else{
+        //     // West
+        //     closestSegment = GearWheelSegment.West;
+        // }
 
 
-        if(closestSegment == GearWheelSegment.North){
-            gearWheelSegments[0].isOn = true;
-        }
-        if(closestSegment == GearWheelSegment.East){
-            gearWheelSegments[1].isOn = true;
-        }
-        if(closestSegment == GearWheelSegment.South){
-            gearWheelSegments[2].isOn = true;
-        }
-        if(closestSegment == GearWheelSegment.West){
-            gearWheelSegments[3].isOn = true;
-        }
+        // if(closestSegment == GearWheelSegment.North){
+        //     gearWheelSegments[0].isOn = true;
+        // }
+        // if(closestSegment == GearWheelSegment.East){
+        //     gearWheelSegments[1].isOn = true;
+        // }
+        // if(closestSegment == GearWheelSegment.South){
+        //     gearWheelSegments[2].isOn = true;
+        // }
+        // if(closestSegment == GearWheelSegment.West){
+        //     gearWheelSegments[3].isOn = true;
+        // }
 
-        selectedSegment = closestSegment;
+        // selectedSegment = closestSegment;
     }
 
     public void OpenWheelToAssign(InventoryItem itemToAssign){
-        List<TextMeshProUGUI> pertinentTextObjects;
+        // List<TextMeshProUGUI> pertinentTextObjects;
+        // // Setup each gear wheel segment
+        // pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]};
         
-        // Setup each gear wheel segment
-        pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]};
-        SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
-        // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemAssignText, eastItemRoom);
-        // SetupGearWheelSegment(southItems, southSelectedIndex, southItemAssignText, southItemRoom);
-        // SetupGearWheelSegment(westItems, westSelectedIndex, westItemAssignText, westItemRoom);
+        // // Counts backwards so indexing doesn't get messed up
+        // // Clear any empty slots
+        // for(int i = northItems.Count - 1; i >= 0; i--)
+        // {
+        //     if(northItems[i].Empty()){
+        //         northItems.Remove(northItems[i]);
+        //     }
+        //     else{
+        //         Debug.Log("not empty");
+        //     }
+        // }
         
-        assignGearWheel.SetActive(true);
+        // if(northItems.Count < 8){
+        //     // Add an empty slot to assign to
+        //     northItems.Add(new GearWheelSlot());
+        // }
 
-        // Disable unwanted actions
-        playerInput.actions["Sheathe Weapon"].Disable();
-        playerInput.actions["Attack"].Disable();
-        playerInput.actions["Off-Hand Attack"].Disable();
-        playerInput.actions["Inventory"].Disable();
-        playerInput.actions["Interact"].Disable();
-        playerInput.actions["menu"].Disable();
-        playerInput.actions["look"].Disable();
-        playerInput.actions["Melee Power Attack"].Disable();
-        playerInput.actions["Melee Off-Hand Power Attack"].Disable();
-        playerInput.actions["Ranged Attack"].Disable();
-        playerInput.actions["Cancel Ranged Attack"].Disable();
 
-        // Enable cancel gear wheel
-        playerInput.actions["Cancel Gear Wheel"].Enable();
+        // SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
+        // // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemAssignText, eastItemRoom);
+        // // SetupGearWheelSegment(southItems, southSelectedIndex, southItemAssignText, southItemRoom);
+        // // SetupGearWheelSegment(westItems, westSelectedIndex, westItemAssignText, westItemRoom);
+        
+        // assignGearWheel.SetActive(true);
 
-        foreach(Button button in gearWheelAssignButtons){
-            button.onClick.RemoveAllListeners();
-        }
-        gearWheelAssignButtons[0].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.North);});
-        // gearWheelAssignButtons[1].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.East);});
-        // gearWheelAssignButtons[2].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.South);});
-        // gearWheelAssignButtons[3].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.West);});
+        // // Disable unwanted actions
+        // playerInput.actions["Sheathe Weapon"].Disable();
+        // playerInput.actions["Attack"].Disable();
+        // playerInput.actions["Off-Hand Attack"].Disable();
+        // playerInput.actions["Inventory"].Disable();
+        // playerInput.actions["Interact"].Disable();
+        // playerInput.actions["menu"].Disable();
+        // playerInput.actions["look"].Disable();
+        // playerInput.actions["Melee Power Attack"].Disable();
+        // playerInput.actions["Melee Off-Hand Power Attack"].Disable();
+        // playerInput.actions["Ranged Attack"].Disable();
+        // playerInput.actions["Cancel Ranged Attack"].Disable();
+
+        // // Enable cancel gear wheel
+        // playerInput.actions["Cancel Gear Wheel"].Enable();
+        // playerInput.actions["Navigate Gear Wheel"].Enable();
+
+        // foreach(Button button in gearWheelAssignButtons){
+        //     button.onClick.RemoveAllListeners();
+        // }
+
+        // // gotta fix scrolling
+        // gearWheelAssignButtons[0].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.North, northSelectedIndex);});
+        // // gearWheelAssignButtons[1].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.East);});
+        // // gearWheelAssignButtons[2].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.South);});
+        // // gearWheelAssignButtons[3].onClick.AddListener(delegate{ AssignItemToGearWheel(itemToAssign, GearWheelSegment.West);});
     }
 
-    public void AssignItemToGearWheel(InventoryItem item, GearWheelSegment segment){
-        // I'll want to add some checks here to ensure an item can only be place in one segment at a time
-        // Maybe when adding the item to a segment, check if segments already contain the item
-        // List<InventoryItem> SegmentContainingItem() { return List<InventoryItem> or null}
-        // If so, delete from segment that contains it and add it to the new one
-        // Show warning popup?
-        List<InventoryItem> formerlyAssignedSegment = SegmentListContainingItem(item);
-        if(formerlyAssignedSegment != null){
-            formerlyAssignedSegment.Remove(item);
-        }
-        
-        // Add item to appropriate list
-        if(segment == GearWheelSegment.North){
-            northItems.Add(item);
-            // SetupGearWheelSegment(northItems, northSelectedIndex, new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]}, northItemRoom);
-        }
-        else if(segment == GearWheelSegment.East){
-            eastItems.Add(item);
-            // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemAssignText, eastItemRoom);
-        }
-        else if(segment == GearWheelSegment.South){           
-            southItems.Add(item);
-            // SetupGearWheelSegment(southItems, southSelectedIndex, southItemAssignText, southItemRoom);
-        }
-        else{
-            westItems.Add(item);
-            // SetupGearWheelSegment(westItems, westSelectedIndex, westItemAssignText, westItemRoom);
-        }
+    public void AssignItemToGearWheel(InventoryItem item, GearWheelSegment segment, int index = 0){
+        // // I'll want to add some checks here to ensure an item can only be place in one segment at a time
+        // // Maybe when adding the item to a segment, check if segments already contain the item
+        // // List<InventoryItem> SegmentContainingItem() { return List<InventoryItem> or null}
+        // // If so, delete from segment that contains it and add it to the new one
+        // // Show warning popup?
 
-        CloseAssignGearWheel();
+        // // List<InventoryItem> formerlyAssignedSegment = SegmentListContainingItem(item);
+        // // if(formerlyAssignedSegment != null){
+        // //     formerlyAssignedSegment.Remove(item);
+        // // }
+        
+        // // Add item to appropriate list
+        // if(segment == GearWheelSegment.North){
+        //     Debug.Log("adding item");
+        //     northItems[index].AddItem(item);
+        //     Debug.Log("added item: " + item.sObj.itemName);
+        //     // if(northItems[index].Empty()){
+        //     //     // Assign the item to item1
+        //     // }
+            
+        //     // northItems.Add(item);
+        //     // SetupGearWheelSegment(northItems, northSelectedIndex, new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]}, northItemRoom);
+        // }
+        // else if(segment == GearWheelSegment.East){
+        //     eastItems.Add(item);
+        //     // SetupGearWheelSegment(eastItems, eastSelectedIndex, eastItemAssignText, eastItemRoom);
+        // }
+        // else if(segment == GearWheelSegment.South){           
+        //     southItems.Add(item);
+        //     // SetupGearWheelSegment(southItems, southSelectedIndex, southItemAssignText, southItemRoom);
+        // }
+        // else{
+        //     westItems.Add(item);
+        //     // SetupGearWheelSegment(westItems, westSelectedIndex, westItemAssignText, westItemRoom);
+        // }
+
+        // CloseAssignGearWheel();
     }
 
     void ChangeGearWheelItem(){
-        InputAction action = playerInput.actions["Change Gear Wheel Item"];
+        // InputAction action = playerInput.actions["Change Gear Wheel Item"];
         
-        float scroll = action.ReadValue<Vector2>().y;
-        // Debug.Log(scroll);
+        // float scroll = action.ReadValue<Vector2>().y;
+        // // Debug.Log(scroll);
 
-        if(scroll > 0){
-            // Next item
-            ChangeSegmentSelectedItem(selectedSegment, 1);
-        }
-        else{
-            // Previous item
-            ChangeSegmentSelectedItem(selectedSegment, -1);
-        }
+        // if(scroll > 0){
+        //     // Next item
+        //     ChangeSegmentSelectedItem(selectedSegment, 1);
+        // }
+        // else{
+        //     // Previous item
+        //     ChangeSegmentSelectedItem(selectedSegment, -1);
+        // }
         
     }
 
     void ChangeSegmentSelectedItem(GearWheelSegment segment, int inc){
-        if(segment == GearWheelSegment.North){
-            northSelectedIndex = IncrementSegmentSelectedIndex(northItems, northSelectedIndex, inc);
+        // if(segment == GearWheelSegment.North){
+        //     northSelectedIndex = IncrementSegmentSelectedIndex(northItems, northSelectedIndex, inc);
 
-            List<TextMeshProUGUI> pertinentTextObjects; 
-            if(gearWheel.activeSelf){
-                pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[0], northItemTextObjects[2]};
-                SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
-            }
-            else{
-                pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]};
-                SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
-            }
-        }
-        else if(segment == GearWheelSegment.East){
+        //     List<TextMeshProUGUI> pertinentTextObjects; 
+        //     if(gearWheel.activeSelf){
+        //         pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[0], northItemTextObjects[2]};
+        //         SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
+        //     }
+        //     else{
+        //         pertinentTextObjects = new List<TextMeshProUGUI>(){northItemTextObjects[1], northItemTextObjects[3]};
+        //         SetupGearWheelSegment(northItems, northSelectedIndex, pertinentTextObjects, northItemRoom);
+        //     }
+        // }
+        // else if(segment == GearWheelSegment.East){
 
-        }
-        else if(segment == GearWheelSegment.South){
+        // }
+        // else if(segment == GearWheelSegment.South){
 
-        }
-        else{
+        // }
+        // else{
 
-        }
+        // }
     }
 
-    int IncrementSegmentSelectedIndex(List<InventoryItem> segmentList, int i, int inc){
-        i += inc;
+    int IncrementSegmentSelectedIndex(List<GearWheelSlot> segmentList, int i, int inc, bool assigning = false){
+        // i += inc;
+        // int ceiling = segmentList.Count;
 
-        // If outside bounds, carry over
-        if(i >= segmentList.Count){
-            i = 0;
-        }
-        else if(i < 0){
-            i = segmentList.Count - 1;
-        }
 
-        // If position in list is null, carry over
-        if(segmentList[i] == null){
-            i = 0;
-        }
+        // // if(assigning && segmentList.Count < 8){
+        // //     ceiling += 1;
+        // // }
+
+
+        // // If outside bounds, carry over
+        // if(i >= ceiling){
+        //     i = 0;
+        // }
+        // else if(i < 0){
+        //     i = ceiling - 1;
+        // }
+
+        // // If position in list is null, carry over
+        // if(segmentList[i] == null){
+        //     i = 0;
+        // }
+        
+        // Debug.Log("northSelectedIndex" + i);
 
         return i;
     }
 
 
-    List<InventoryItem> SegmentListContainingItem(InventoryItem itemToSearchFor){
-        if(northItems.Contains(itemToSearchFor)){
-            return northItems;
-        }
-        else if(eastItems.Contains(itemToSearchFor)){
-            return eastItems;
-        }
-        else if(southItems.Contains(itemToSearchFor)){
-            return southItems;
-        }
-        else if(westItems.Contains(itemToSearchFor)){
-            return westItems;
-        }
-
+    GearWheelSlot GearWheelSlotContainingItem(InventoryItem itemToSearchFor){
+        // List<GearWheelSlot>[] segmentLists = new List<GearWheelSlot>[] { northItems}; // , eastItems, southItems, westItems
+        
+        // foreach (var list in segmentLists)
+        // {
+        //     foreach (GearWheelSlot slot in list)
+        //     {
+        //         if(slot.Contains(itemToSearchFor)){
+        //             return slot;
+        //         }
+        //     }
+        // }
+        
         return null;
+        // if(northItems.Contains(itemToSearchFor)){
+        //     return northItems;
+        // }
+        // else if(eastItems.Contains(itemToSearchFor)){
+        //     return eastItems;
+        // }
+        // else if(southItems.Contains(itemToSearchFor)){
+        //     return southItems;
+        // }
+        // else if(westItems.Contains(itemToSearchFor)){
+        //     return westItems;
+        // }
+
     }
 
     void CloseAssignGearWheel(){
-        // Hide gear wheel
-        assignGearWheel.SetActive(false);
+        // // Hide gear wheel
+        // assignGearWheel.SetActive(false);
 
-        playerInput.actions["Inventory"].Enable();
-        playerInput.actions["menu"].Enable();
+        // playerInput.actions["Inventory"].Enable();
+        // playerInput.actions["menu"].Enable();
         
 
-        // Disable cancel gear wheel
-        playerInput.actions["Cancel Gear Wheel"].Disable();
+        // // Disable cancel gear wheel
+        // playerInput.actions["Cancel Gear Wheel"].Disable();
     }
 
     void CloseGearWheel(GearWheelSegment gearWheelSegment){
-        // Hide gear wheel
-        gearWheel.SetActive(false);
-        // Return time to what it was before opening the gear wheel
-        Time.timeScale = previousTimeScale;
-        // Enable pause action, other menu actions
+        // // Hide gear wheel
+        // gearWheel.SetActive(false);
+        // // Return time to what it was before opening the gear wheel
+        // Time.timeScale = previousTimeScale;
+        // // Enable pause action, other menu actions
 
-        playerInput.actions["Sheathe Weapon"].Enable();
-        playerInput.actions["look"].Enable();
-        playerInput.actions["Inventory"].Enable();
-        playerInput.actions["menu"].Enable();
-    playerInput.actions["Interact"].Enable();
+        // playerInput.actions["Sheathe Weapon"].Enable();
+        // playerInput.actions["look"].Enable();
+        // playerInput.actions["Inventory"].Enable();
+        // playerInput.actions["menu"].Enable();
+        // playerInput.actions["Interact"].Enable();
 
-        // Disable cancel gear wheel
-        playerInput.actions["Cancel Gear Wheel"].Disable();
-        playerInput.actions["Navigate Gear Wheel"].Disable();
+        // // Disable cancel gear wheel
+        // playerInput.actions["Cancel Gear Wheel"].Disable();
+        // playerInput.actions["Navigate Gear Wheel"].Disable();
 
-        // Equip/use item
-        if(gearWheelSegment == GearWheelSegment.North){
-            // Pass northItems[northSelectedIndex] into function that will detect item's type and call appropriate function (equip, consume, use, etc.)
-            if(northItems.Count != 0)
-                DetectItemTypeAndPerformUseAction(northItems[northSelectedIndex]);
-        }
-        if(gearWheelSegment == GearWheelSegment.None){
-            selectedSegment = GearWheelSegment.None;
-        }
+        // // Equip/use item
+        // if(gearWheelSegment == GearWheelSegment.North){
+        //     // Pass northItems[northSelectedIndex] into function that will detect item's type and call appropriate function (equip, consume, use, etc.)
+        //     if(northItems.Count != 0)
+        //         DetectItemTypeAndPerformUseAction(northItems[northSelectedIndex].item1);
+        // }
+        // if(gearWheelSegment == GearWheelSegment.None){
+        //     selectedSegment = GearWheelSegment.None;
+        // }
 
-        FindObjectOfType<PlayerCombatAgent>().UpdateAnimators();
+        // FindObjectOfType<PlayerCombatAgent>().UpdateAnimators();
 
     }
 
     void DetectItemTypeAndPerformUseAction(InventoryItem itemToUse){
-        if(itemToUse == null)
-            return;
+        // if(itemToUse == null)
+        //     return;
         
-        // Consumable
-        if(itemToUse.sObj.type == Item.ItemType.Potion ||
-           itemToUse.sObj.type == Item.ItemType.Food)
-        {
-            // Perform item's effect
-            ConsumeItem(itemToUse);
-        }
-        else if(itemToUse.sObj.type == Item.ItemType.Weapon
-                ) // || itemToUse.sObj.type == Item.ItemType.MagicWeapon
-        {
-            // Time to overhaul the equipping system
-            // 1-24-24: Done!
-            FindObjectOfType<PlayerEquipment>().AutoEquip(itemToUse.sObj);
-        }
+        // switch(itemToUse.sObj.type){
+        //     case(Item.ItemType.Potion):
+        //     case(Item.ItemType.Food):
+        //         ConsumeItem(itemToUse);
+        //     break;
+
+        //     case(Item.ItemType.Necklace):
+        //     case(Item.ItemType.Weapon):
+        //         FindObjectOfType<PlayerEquipment>().AutoEquip(itemToUse.sObj);
+        //     break;
+        // }
+
 
     }
-
+// TODO multiple items to a slot in gear wheel: started working with assign wheel
 #endregion
 
     public void AddItem(InventoryItem a){
         if(a.sObj.type == Item.ItemType.Currency){
             playerCurrency += a.sObj.value * a.count;
+            currencyTextAssigner.SetText(0, "Gold: " + playerCurrency.ToString());
             return;
         }
         
@@ -671,19 +827,29 @@ public class PlayerInventory : MonoBehaviour
     }
 
     void RemoveItemFromGearWheel(InventoryItem itemToRemove){
-        List<InventoryItem>[] segmentLists = new List<InventoryItem>[]{ northItems, eastItems, southItems, westItems};
+        List<GearWheelSlot>[] segmentLists = new List<GearWheelSlot>[]{ northItems}; // , eastItems, southItems, westItems 
+        // TODO put these other item lists in this list
 
         foreach(var list in segmentLists){
-            if(list.Contains(itemToRemove)){
-                list.Remove(itemToRemove);
-                return;
+            foreach (GearWheelSlot slot in list)
+            {
+                if(slot.Contains(itemToRemove)){
+                    slot.RemoveItem(itemToRemove);
+                    return;
+                }
             }
         }
     }
 
     public void ConsumeItem(InventoryItem itemToConsume){
         // Do something based on the item's ItemEffect
-        itemToConsume.gObj.GetComponent<IConsumable>().Consume(gameObject);
+        // itemToConsume.gObj.GetComponent<IConsumable>().Consume(gameObject);
+
+        foreach (var effect in itemToConsume.sObj.effects)
+        {
+            EffectUtility.SetupEffect(effect, GetComponent<PlayerEquipment>().statusEffectContainer, gameObject, itemToConsume.sObj);
+        }
+        
         
         if(itemToConsume.count > 1){
             itemToConsume.count--;
@@ -920,6 +1086,15 @@ public class PlayerInventory : MonoBehaviour
         return false;
     }
 
+    public InventoryItem ReturnInventoryItem(Item item){
+        foreach(var inventoryItem in playerInventory){
+            if(inventoryItem.sObj == item){
+                return inventoryItem;
+            }
+        }
+        return null;
+    }
+
     public int ReturnItemCount(Item item){
         // If ammo count ever appears as -1, something went wrong
         int ic = -1;
@@ -943,14 +1118,14 @@ public class PlayerInventory : MonoBehaviour
                     Debug.Log("item count: " + iItem.count);
                     // Remove item from inventory
                     if(ItemEquipped(item)){
-                        Debug.Log("item is equipped");
+                        // Debug.Log("item is equipped");
                         
                         RemoveFromEquipped(item);
                         
                         PlayerEquipment playerEquipment = FindObjectOfType<PlayerEquipment>();
-                        Debug.Log("playerEquipment found on gameobject: " + playerEquipment.gameObject.name);
-                        playerEquipment.UnequipSlot(ref playerEquipment.ammunition);
-                        Debug.Log("ammunition is now: " + playerEquipment.ammunition);
+                        // Debug.Log("playerEquipment found on gameobject: " + playerEquipment.gameObject.name);
+                        playerEquipment.UnequipSlot(ref playerEquipment.ammunition, true);
+                        // Debug.Log("ammunition is now: " + playerEquipment.ammunition);
                         selectedItem = null;
                         // Hide item actions and inspector
                         itemActionsMenu.gameObject.SetActive(false);

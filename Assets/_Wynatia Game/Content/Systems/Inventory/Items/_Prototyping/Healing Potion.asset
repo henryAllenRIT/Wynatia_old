@@ -14,8 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Healing Potion
   type: 7
-  effect: 1
+  effects:
+  - magnitude_F: 0
+    magnitude_I: 20
+    effect: {fileID: 11400000, guid: 77728e3098bbe482093bb84ced8258c9, type: 2}
   itemLevel: 1
   value: 0
   worldObject: {fileID: 7724804368545545415, guid: 8002a7b88ca5741e2abf771e76628625,
     type: 3}
+  description: 
+  twoHanded: 0
+  meleeWeaponScriptableObject: {fileID: 0}
+  rangedWeaponScriptableObject: {fileID: 0}
+  ammunitionScriptableObject: {fileID: 0}

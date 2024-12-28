@@ -36,11 +36,31 @@ public class Item : ScriptableObject
         None,
         Heal
     }
+[System.Serializable]
+    public class EquipmentStatusEffect{
+        // public float duration;
+        public float magnitude_F = 0;
+        public int magnitude_I = 0;
+        public StatusEffect effect;
+
+// TODO make effects defined in the item be passive, while items defined in weapon sObjs are activated
+// active effects in items would tie-in with the ability system
+
+
+        public EquipmentStatusEffect(float m, StatusEffect e){
+            magnitude_F = m;
+            effect = e;
+        }        
+        public EquipmentStatusEffect(int m, StatusEffect e){
+            magnitude_I = m;
+            effect = e;
+        }
+    }
 
     
     public string itemName;
     public ItemType type;
-    public ItemEffect effect;
+    public EquipmentStatusEffect[] effects;
     public int itemLevel;
     public int value = 0;
     public GameObject worldObject;

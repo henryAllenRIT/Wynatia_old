@@ -46,11 +46,16 @@ public class WorldItemManager : MonoBehaviour
         WorldItem[] scripts = FindObjectsOfType<WorldItem>();
         foreach (var script in scripts)
         {
+            // Debug.Log(script);
             if(script.scriptableObject.type == Item.ItemType.Arrows || script.scriptableObject.type == Item.ItemType.Bolts || script.scriptableObject.type == Item.ItemType.Projectile){
-                if(script.pickupEnabled && !script.transform.parent.CompareTag("Player")){
+                if(script.pickupEnabled){
                     // Parent check above prevents the game from saving an arrow that the player is drawing/has drawn but not fired
+                    if(script.transform.parent){
+                        if(!script.transform.parent.CompareTag("Player")){
+                            script.transform.parent = transform;
+                        }
+                    }
 
-                    script.transform.parent = transform;
                 }
             }
         }
@@ -81,6 +86,10 @@ public class WorldItemManager : MonoBehaviour
         // Is world items length correct upon saving?
         // Yes
         // Debug.Log("World Items Length: " + worldItems.Count);
+        // for (int i = 0; i < worldItems.Count; i++)
+        // {
+        //     Debug.Log(worldItems[i]);
+        // }
 
         // Armor is going in here with the correct save position
         // Put breakpoint at loading from ES3 to see if it's correct there
@@ -99,6 +108,13 @@ public class WorldItemManager : MonoBehaviour
 
             worldItems = ES3.Load<List<GameObject>>("World Items List");
 
+            // for (int i = 0; i < worldItems.Count; i++)
+            // {
+            //     Debug.Log(worldItems[i]);
+            // }
+
+            // Debug.Log("World Items list count: " + worldItems.Count);
+            // Seems to be spawning the correct number of items, just the wrong ones (armor instead of what its supposed to be)
 
             // Is worldItems the correct length (48 items long) when it's loaded the first and second times? Does it's length change across the loads?
             // Yes, it is correct both times (note that first load is the second play, second load is the third play)
@@ -117,8 +133,10 @@ public class WorldItemManager : MonoBehaviour
 
             for (int i = 0; i < worldItems.Count; i++)
             {
-                var prefab = worldItems[i].GetComponent<WorldItem>().scriptableObject.worldObject;
+                // var prefab = worldItems[i].GetComponent<WorldItem>().scriptableObject.worldObject;
+                var prefab = worldItems[i].GetComponent<WorldItem>().prefab;
 
+                // Debug.Log("world Item: " + worldItems[i] + "; sObj: " + worldItems[i].GetComponent<WorldItem>().prefab);
                 // pos.Add(worldItems[i].transform.position + Vector3.up * spawnHeightOffset);
                 // rot.Add(worldItems[i].transform.rotation);
                 worldItems[i] = prefab;

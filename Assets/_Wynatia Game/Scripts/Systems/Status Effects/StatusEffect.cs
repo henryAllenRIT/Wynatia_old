@@ -2,17 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatusEffect : MonoBehaviour
+[CreateAssetMenu(fileName = "Status Effect")]
+public class StatusEffect : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public string effectName;
+    public Texture2D icon;
+    public string description;
+    public GameObject effectObject;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // TODO saving status effects between play sessions
+
 }

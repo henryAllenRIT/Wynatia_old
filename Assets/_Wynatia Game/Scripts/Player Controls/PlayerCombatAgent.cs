@@ -45,7 +45,7 @@ public class PlayerCombatAgent : MonoBehaviour
 
     float mainRechargedTime = 0;
     float altRechargedTime = 0;
-    float rangedRechargedTime = 0;
+    // float rangedRechargedTime = 0;
 
 
     private PlayerEquipment playerEquipment;
@@ -204,7 +204,6 @@ public class PlayerCombatAgent : MonoBehaviour
 
     }
 
-// TODO finish implementing two handed weapons with PCA
     public void RepairCombatAgentAfterMenuClose(){
         UpdateAnimators();
         CancelRangedAttack();
@@ -357,7 +356,7 @@ public class PlayerCombatAgent : MonoBehaviour
         }
     }
     bool ReadyToFire(){
-        if(!Pause.PauseManagement.paused && !weaponSheathed && Time.time >= rangedRechargedTime){
+        if(!Pause.PauseManagement.paused && !weaponSheathed && Time.time >= mainRechargedTime){
             return true;
         }
         return false;
@@ -404,8 +403,7 @@ public class PlayerCombatAgent : MonoBehaviour
             }
         }
     }
-// FIXME ranged attacks when reloading game cause arrow to instantly spawn with colliders enabled and pickup disabled
-// maybe input actions are being called out of order because some are enabled when they shouldn't be?
+
     void RangedAttack(){
         if(ammunitionContainer.transform.childCount != 0){
             // Debug.Log("Ranged attack! interactions: " + FindObjectOfType<PlayerInput>().actions["Ranged Attack"].bindings[0].effectiveInteractions);
@@ -443,12 +441,7 @@ public class PlayerCombatAgent : MonoBehaviour
 
             // Remove one arrow from inventory
             FindObjectOfType<PlayerInventory>().DecrementItemCount(playerEquipment.ammunition, true);
-            if(FindObjectOfType<PlayerInventory>().ReturnItemCount(playerEquipment.ammunition) <= 0){
-                // Debug.Log("a");
-                AssignReferences();
-                playerEquipment.UnequipSlot(ref playerEquipment.ammunition);
-                // Debug.Log("d");
-            }
+
 
             if(playerEquipment.ammunition){
                 ammunitionDisplay.SetText(playerEquipment.ammunition.itemName + " ("+ FindObjectOfType<PlayerInventory>().ReturnItemCount(playerEquipment.ammunition) + ")");
@@ -457,7 +450,7 @@ public class PlayerCombatAgent : MonoBehaviour
                 ammunitionDisplay.SetText("No ammunition equipped");
             
             reticleController.SetReticle((int)ReticleController.Reticle.X);
-            rangedRechargedTime = Time.time + rangedCooldownTime;
+            mainRechargedTime = Time.time + rangedCooldownTime;
             StartCoroutine(ManageCooldown(rangedAnimator));
         }
     }
@@ -595,7 +588,7 @@ public class PlayerCombatAgent : MonoBehaviour
             yield return new WaitUntil(() => Time.time >= altRechargedTime);
         }
         else if(anim == rangedAnimator){
-            yield return new WaitUntil(() => Time.time >= rangedRechargedTime);
+            yield return new WaitUntil(() => Time.time >= mainRechargedTime);
         }
 
         reticleController.SetReticle((int)ReticleController.Reticle.Dot);

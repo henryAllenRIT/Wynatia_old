@@ -6,7 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class WorldItem : MonoBehaviour
 {
+    
+    [Header("***ENABLE ES3 SAVING FOR THIS ITEM'S PREFAB")]
     public Item scriptableObject;
+    public GameObject prefab;
     public int quantity = 1;
     public Vector3 positionToSave = Vector3.zero;
     public bool instanceKinematic = false;
@@ -107,7 +110,15 @@ public class WorldItem : MonoBehaviour
     }
 
     public void DisablePhysicsColliders(){
-        StartCoroutine(WaitThenDisableColliders());
+        // StartCoroutine(WaitThenDisableColliders());
+
+        // Disabling the colliders would result in not being able to pickup item
+        // We can't put the object on a different layer because the raycast looks for items on the inventory item layer
+        // We can set the item to ignore the player and default layers
+        foreach (var col in modelColliders)
+        {
+            col.excludeLayers = LayerMask.GetMask("Player", "Default");
+        }
     }
 
     IEnumerator WaitThenDisableColliders(){

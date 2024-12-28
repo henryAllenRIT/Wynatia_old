@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8067025678988635788}
   - component: {fileID: 8067025678988635789}
   - component: {fileID: 8067025678988635790}
-  - component: {fileID: 6332716297299579796}
+  - component: {fileID: 208959151489748903}
   m_Layer: 3
   m_Name: Armor
   m_TagString: Inventory Item
@@ -60,7 +60,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 0
+  m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -80,10 +80,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptableObject: {fileID: 11400000, guid: 32d272ec9d8b64acbacd87e5e8333273, type: 2}
+  prefab: {fileID: 8067025678988635792}
   quantity: 1
   positionToSave: {x: 0, y: 0, z: 0}
   instanceKinematic: 0
   modelColliders: []
+  pickupEnabled: 1
+  disableMyCollidersIfKinematic: 0
 --- !u!135 &8067025678988635790
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -105,7 +108,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.06
   m_Center: {x: 0, y: 0.57, z: 0}
---- !u!114 &6332716297299579796
+--- !u!114 &208959151489748903
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,52 +120,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baff8732cd3074ef88b34f9cc487846d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabId: 633604360545593836
+  prefabId: 3717615103705584693
   localRefs:
     _Keys:
+    - {fileID: 8067025679231041142}
+    - {fileID: 8067025679231041139}
     - {fileID: 4800000, guid: e6e9a19c3678ded42a3bc431ebef7dbd, type: 3}
     - {fileID: 4800000, guid: 36e335017ad71d54fbb10842863188ae, type: 3}
     - {fileID: 8067025679016859460}
     - {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-    - {fileID: 8067025679016859462}
-    - {fileID: 8067025679118059355}
-    - {fileID: 11500000, guid: dfeeab43ab2904e2ea4b81b0f38048e3, type: 3}
-    - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-    - {fileID: 11500000, guid: 7e2cacabe81aea8468e08e911727ee97, type: 3}
-    - {fileID: 8067025679118059359}
-    - {fileID: 8067025679982690627}
-    - {fileID: 8067025679982690628}
-    - {fileID: 8067025679982690624}
-    - {fileID: 8067025679610122962}
-    - {fileID: 8067025678988635792}
-    - {fileID: 8067025679016859463}
     - {fileID: 8067025679231041141}
-    - {fileID: 8067025679231041138}
-    - {fileID: 8067025679016859461}
-    - {fileID: 8067025679610122964}
     - {fileID: 8067025679118059358}
-    - {fileID: 8067025679231041139}
-    - {fileID: 11500000, guid: f77642a26f35e48e48702f8c61a1726a, type: 3}
-    - {fileID: 8067025679118059356}
-    - {fileID: 8067025679118059357}
-    - {fileID: 8067025678988635790}
-    - {fileID: 8067025679610122963}
-    - {fileID: 8067025679231041142}
-    - {fileID: 8067025679610122965}
     - {fileID: 8067025679016859464}
-    - {fileID: 11500000, guid: baff8732cd3074ef88b34f9cc487846d, type: 3}
-    - {fileID: 6332716297299579796}
+    - {fileID: 8067025679982690624}
+    - {fileID: 208959151489748903}
+    - {fileID: 8067025679231041140}
+    - {fileID: 8067025679610122965}
+    - {fileID: 8067025679610122962}
+    - {fileID: 11500000, guid: dfeeab43ab2904e2ea4b81b0f38048e3, type: 3}
+    - {fileID: 8067025679016859463}
+    - {fileID: 8067025679982690627}
+    - {fileID: 8067025679610122964}
     - {fileID: 8067025679610122961}
-    - {fileID: 8067025678988635789}
+    - {fileID: 8067025679231041138}
+    - {fileID: 8067025679118059355}
+    - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+    - {fileID: 11500000, guid: baff8732cd3074ef88b34f9cc487846d, type: 3}
     - {fileID: 8067025679982690625}
     - {fileID: 8067025679982690626}
-    - {fileID: 8067025679231041140}
     - {fileID: 8067025678988635788}
+    - {fileID: 8067025679016859461}
+    - {fileID: 8067025679016859462}
+    - {fileID: 8067025679610122963}
+    - {fileID: 8067025679982690628}
+    - {fileID: 11500000, guid: f77642a26f35e48e48702f8c61a1726a, type: 3}
+    - {fileID: 8067025679118059359}
+    - {fileID: 8067025679118059356}
+    - {fileID: 8067025678988635790}
+    - {fileID: 8067025678988635792}
+    - {fileID: 8067025678988635789}
     - {fileID: 8067025678988635791}
+    - {fileID: 8067025679118059357}
     - {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
     - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
     - {fileID: 11400000, guid: 32d272ec9d8b64acbacd87e5e8333273, type: 2}
-    _Values: 59823be4d226a7488e048012226b6e4edc5d05261c8ba178a06dd2526805054d5bba415ebbf7133c9040974e5360a123d943bd4cc8e73558b0aaae900e218e54e1972ce4032e4254ae73d83a52ab4022f0c9b6595e117a4a10cceddeeeaef95b5831c4ffb319af31875c2b47f6201d3d5080f371ec255e0654d13e946dbc66189904958d3c683615e36bfa3442395d38c8853e4bed3b966e73d6a6199f6fe9677eee342877173a4f3b3114b583eabf476f4c0cbf1ce1874613c69bcb81451f64ce0b76a06593706485a3f6828ddab400a46180e36c076e6414d54c57e4bec06f2fe80f3a04a15036aa38cbf9ca12072f08ae8722c43dc9523d132a95ab0e1c1398f90290a8d33f349c791f6b7510062a373e4fcb272e382cb7a2664750c2912f7a6acfd9b20de07993d4ea6629ba164745c181b2af5ed3567f38fc643b630c554f9960278f9790319a473c6ef0b08851
+    _Values: 9bf44feb4fb1122f5da1c9d1fe450e0c25bbfb44b2962c3aaeed2b6e32fd330bcd698b3efaa07e36bec4493f2c30667f574c389f54a41204c715993cdd81615b2b2afc6a452fed7a3cc586ed4ced0e21ab553a80c92da029578677e50742593c9d1195a8d22e3a79c64c9d70e1db4725fa886f77b81e6e57cb25c2cca6d2820595b675a17c490c258fb34615ca110a32326321704e2e0b7d5cc1225393912d0c356723d49a59575083b6f8949a7bdd2431f49a43b012b765abf7fe3e6b5fb9028539e062ed369774bb71f304279f181fe4fe83872c70bd47e277806ea86a441c9105f19f6485c9668d0f883e1eb23e0b2021dc961cbed0148467bb9a49fae250d2288cdd528645693915ebc30603992e3a748fc947db394f29f9e40336d1e26d2d3811463e1b5d65dc73ce31aa941b7fce8d61d46b1909519e244ba75ebecc09f95996cef252ef1d
 --- !u!1 &8067025679016859464
 GameObject:
   m_ObjectHideFlags: 0

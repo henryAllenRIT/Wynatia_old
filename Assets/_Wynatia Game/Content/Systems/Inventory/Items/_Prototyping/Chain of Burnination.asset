@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfeeab43ab2904e2ea4b81b0f38048e3, type: 3}
+  m_Name: Chain of Burnination
+  m_EditorClassIdentifier: 
+  itemName: Chain of Burnination
+  type: 3
+  effects:
+  - magnitude_F: 0
+    magnitude_I: 5
+    effect: {fileID: 11400000, guid: 612ab7434833e4b38881bfef2ab9252f, type: 2}
+  itemLevel: 0
+  value: 0
+  worldObject: {fileID: 388166490072886812, guid: 6ff11af347ab04333ac630852503e5a1,
+    type: 3}
+  description: A necklace with a strange and seemingly counterintuitive enchantment
+    that burns the wearer.
+  twoHanded: 0
+  meleeWeaponScriptableObject: {fileID: 0}
+  rangedWeaponScriptableObject: {fileID: 0}
+  ammunitionScriptableObject: {fileID: 0}

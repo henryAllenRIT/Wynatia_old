@@ -14,8 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Bread
   type: 8
-  effect: 0
+  effects:
+  - magnitude_F: 0
+    magnitude_I: 1
+    effect: {fileID: 11400000, guid: 612ab7434833e4b38881bfef2ab9252f, type: 2}
   itemLevel: 0
   value: 0
   worldObject: {fileID: 5778409416758616797, guid: 10597a4ec2dfe4512b126218e23cdee5,
     type: 3}
+  description: 
+  twoHanded: 0
+  meleeWeaponScriptableObject: {fileID: 0}
+  rangedWeaponScriptableObject: {fileID: 0}
+  ammunitionScriptableObject: {fileID: 0}

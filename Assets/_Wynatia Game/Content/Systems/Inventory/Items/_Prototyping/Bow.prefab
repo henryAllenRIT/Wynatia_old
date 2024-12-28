@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6268625748309531568}
   - component: {fileID: 128913407724965458}
   - component: {fileID: 5228486115587972854}
-  - component: {fileID: -2200649454893360623}
+  - component: {fileID: 7078947192580731364}
   m_Layer: 3
   m_Name: Bow
   m_TagString: Inventory Item
@@ -97,12 +97,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptableObject: {fileID: 11400000, guid: f0b79ec971b04459797255bcf9827da6, type: 2}
+  prefab: {fileID: 439033734980675746}
   quantity: 1
   positionToSave: {x: 0, y: 0, z: 0}
   instanceKinematic: 0
   modelColliders:
   - {fileID: 3051635266676894608}
---- !u!114 &-2200649454893360623
+  pickupEnabled: 1
+  disableMyCollidersIfKinematic: 0
+--- !u!114 &7078947192580731364
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -114,32 +117,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baff8732cd3074ef88b34f9cc487846d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabId: 4021111165174779954
+  prefabId: 8995493393236685716
   localRefs:
     _Keys:
+    - {fileID: 7078947192580731364}
+    - {fileID: 2236250537823736536}
     - {fileID: 4800000, guid: e6e9a19c3678ded42a3bc431ebef7dbd, type: 3}
     - {fileID: 4800000, guid: 36e335017ad71d54fbb10842863188ae, type: 3}
-    - {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-    - {fileID: -2200649454893360623}
     - {fileID: 1511314834333593754}
-    - {fileID: 8501064491674227009}
-    - {fileID: 11500000, guid: f77642a26f35e48e48702f8c61a1726a, type: 3}
+    - {fileID: 6268625748309531568}
+    - {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+    - {fileID: 1093285619770799637}
+    - {fileID: 3995018009494065088}
     - {fileID: 11500000, guid: dfeeab43ab2904e2ea4b81b0f38048e3, type: 3}
+    - {fileID: 439033734980675746}
     - {fileID: 11500000, guid: 9879571b4264c4575a99d5e1aaa7e4b3, type: 3}
     - {fileID: 11500000, guid: baff8732cd3074ef88b34f9cc487846d, type: 3}
-    - {fileID: 3051635266676894608}
-    - {fileID: 5228486115587972854}
-    - {fileID: 1093285619770799637}
-    - {fileID: 2236250537823736536}
-    - {fileID: 6268625748309531568}
-    - {fileID: 439033734980675746}
-    - {fileID: 3995018009494065088}
     - {fileID: 128913407724965458}
+    - {fileID: 5228486115587972854}
+    - {fileID: 8501064491674227009}
+    - {fileID: 3051635266676894608}
+    - {fileID: 11500000, guid: f77642a26f35e48e48702f8c61a1726a, type: 3}
     - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
     - {fileID: 2100000, guid: 0701a431826094ad88722c6286a920d8, type: 2}
-    - {fileID: 11400000, guid: f0b79ec971b04459797255bcf9827da6, type: 2}
     - {fileID: 11400000, guid: ba957e30435df45809a6a86ae01d1038, type: 2}
-    _Values: 869c535b6f45d8638c831a479f36e42979798e1660718b60f9953a048f70b82140c3a44605329923d6e04da88869920340d878bbb2bb610929b463d90ad3d3023c3b07dc929e2347e06bec41bf34e97104364568e974d47b9e6590456a8dd2010d4be5c4706e965d4bcf24b830dfb55c9ed4d6d38e6b194e10827af72f69b16d3ded4d0a19ade16b5f18e1e6b0e4b54150cb576949018d5ece692b0c1772734c8292f51e2dbf754a4abdcd58b200002b
+    - {fileID: 11400000, guid: f0b79ec971b04459797255bcf9827da6, type: 2}
+    _Values: 3ef23ac315a761598bd1e1280f1b721aa138cddf4664f006ca11ab8876c71f119d3ae04c6dcc435c08f4cd493015b06b8ae4b018986bfe5c1ebe07fc04261c3cb1cfc54afbbe872cf671d75196a7d51f3fe8eea587c75531c37cd1513bb9a81fd891fa00dbfb67476cdc232793acc576161741e4c7894b7925f7877fed36f0511bf77a05acd543437e59c5555bd16170beb7c5dc883ba861238bda2c7d18cb5ece740c9c32bfca145b84656ec3f61e54
 --- !u!1 &2236250537823736536
 GameObject:
   m_ObjectHideFlags: 0

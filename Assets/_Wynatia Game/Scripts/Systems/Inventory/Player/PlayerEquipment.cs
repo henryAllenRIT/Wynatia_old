@@ -28,12 +28,15 @@ public class PlayerEquipment : MonoBehaviour
     public Item armor;
 #endregion
 
+    public Transform statusEffectContainer;
+
 #region Non-weapon instance containers
     [SerializeField] Transform necklaceContainer;
 #endregion
 
     private PlayerCombatAgent playerCombatAgent;
     private PlayerCharacter playerCharacter;
+    private PlayerInventory playerInventory;
 
     #region Weapon Instance Management
 
@@ -170,6 +173,7 @@ public class PlayerEquipment : MonoBehaviour
     void Start(){
         playerCombatAgent = FindObjectOfType<PlayerCombatAgent>();
         playerCharacter = FindObjectOfType<PlayerCharacter>();
+        playerInventory = FindObjectOfType<PlayerInventory>();
         LoadEquipment();
 
 
@@ -227,6 +231,21 @@ public class PlayerEquipment : MonoBehaviour
         slot = item;
         AddToPlayerInventoryList(item);
         UpdateEquipmentInstances();
+
+        // Effects
+        if(item.effects.Length > 0){
+            foreach (Item.EquipmentStatusEffect eSEffect in item.effects)
+            {
+                EffectUtility.SetupEffect(eSEffect, statusEffectContainer, gameObject, item);
+                
+                // GameObject g = Instantiate(eSEffect.effect.effectObject, statusEffectContainer);
+                
+                // if(eSEffect.magnitude_I != 0)
+                //     g.GetComponent<Effect>().Activate(-1, gameObject, eSEffect.magnitude_I, item);
+                // if(eSEffect.magnitude_F != 0)
+                //     g.GetComponent<Effect>().Activate(-1, gameObject, eSEffect.magnitude_F, item);
+            }
+        }
     }
 
 
@@ -279,12 +298,16 @@ public class PlayerEquipment : MonoBehaviour
     
 
     public void UnequipSlot(ref Item slot, bool dontEquipUnarmedStrike = false){
-        GetComponent<PlayerInventory>().RemoveFromEquipped(slot);
+        playerInventory.RemoveFromEquipped(slot);
         if(slot){
             if(slot.type == Item.ItemType.Weapon && !slot.twoHanded && !dontEquipUnarmedStrike){ // || slot.type == Item.ItemType.MagicWeapon
                 slot = FindObjectOfType<PlayerCharacter>().unarmedStrike;
             }
             else{
+                if(slot.rangedWeaponScriptableObject){
+                    UnequipSlot(ref ammunition);
+                }
+                
                 slot = null;
             }
 
@@ -294,14 +317,25 @@ public class PlayerEquipment : MonoBehaviour
         }
 
         UpdateEquipmentInstances();
-        
+        CleanupStatusEffects();
+    }
+
+
+    void CleanupStatusEffects(){
+        foreach (Transform child in statusEffectContainer)
+        {
+            if(child.GetComponent<Effect>().effectSource){
+                if(!playerInventory.ItemEquipped(child.GetComponent<Effect>().effectSource)){
+                    child.GetComponent<Effect>().Deactivate();
+                }
+            }
+        }
     }
 
     public void UnequipWeapon(Item item){
 
         // Unequip main hand
         if(rightHand == item && leftHand != item){
-            // TODO Ranged weapons should be equipped to the both hands slot
             // if(rightHand.meleeWeaponScriptableObject)
                 // RemoveWeaponFromMainHandContainer();
             // else
@@ -451,7 +485,7 @@ public class PlayerEquipment : MonoBehaviour
 #endregion
 
     void AddToPlayerInventoryList(Item item){
-        GetComponent<PlayerInventory>().AddToEquippedItemsList(item);
+        playerInventory.AddToEquippedItemsList(item);
     }
 
     public Dictionary<string, Item> EquipableSlotsForItemType(Item.ItemType itemType){
@@ -574,9 +608,14 @@ public class PlayerEquipment : MonoBehaviour
 
     public void AutoEquip(Item itemToEquip){
         switch(itemToEquip.type){
-            case(Item.ItemType.Weapon):
-                Item uS = playerCharacter.unarmedStrike;
+            case(Item.ItemType.Necklace):
+                UnequipSlot(ref necklace);
+                EquipSlot(out necklace, itemToEquip);
 
+                PopulateEquipmentContainer(necklaceContainer, itemToEquip, ref necklace);
+            break;
+
+            case(Item.ItemType.Weapon):
                 if(itemToEquip.twoHanded){
                     UnequipSlot(ref rightHand, true);
                     UnequipSlot(ref leftHand, true);

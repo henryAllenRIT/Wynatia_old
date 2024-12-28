@@ -21,7 +21,7 @@ public class ItemInfoPanel : MonoBehaviour
         // Type
         CreateInfoBlock(item.type.ToString());
         // Effect
-        CreateInfoBlock("Effect:", item.effect.ToString());
+        // CreateInfoBlock("Effect:", item.effect.ToString());
         // Item Level
         CreateInfoBlock("Level:", item.itemLevel.ToString());
         // Value

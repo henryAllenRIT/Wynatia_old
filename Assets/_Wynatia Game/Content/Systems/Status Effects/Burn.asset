@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80f0ab1db052941e894d0ce45dc87b15, type: 3}
+  m_Name: Burn
+  m_EditorClassIdentifier: 
+  effectName: Burn
+  icon: {fileID: 0}
+  description: You are on fire. You take damage every second for 30 seconds or until
+    you put out the flames.
+  effectObject: {fileID: 3981992148356285102, guid: db3e5cc063fb84e8bb5a1ec2b0c42698,
+    type: 3}

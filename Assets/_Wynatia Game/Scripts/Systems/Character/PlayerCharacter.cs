@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCharacter : MonoBehaviour
+public class PlayerCharacter : MonoBehaviour, IAffectable
 {
     public int maxHealth = 100;
     public int currentHealth = 100;
@@ -23,12 +23,31 @@ public class PlayerCharacter : MonoBehaviour
     }
 
 
-    public void ModifyHealth(int amount){
+    public void ModifyCurrentHealth(int amount){
         currentHealth += amount;
 
         if(currentHealth > maxHealth)
             currentHealth = maxHealth;
 
         healthBar.SetHealth(currentHealth, maxHealth);
+    }
+    public void ModifyMaxHealth(int amount){
+        Debug.Log(amount);
+        
+        float oldHealthProportion = (float)currentHealth / (float)maxHealth;
+
+        Debug.Log(oldHealthProportion);
+        
+        maxHealth += amount;
+        currentHealth = Mathf.RoundToInt(oldHealthProportion * maxHealth);
+
+        if(currentHealth > maxHealth)
+            currentHealth = maxHealth;
+
+        healthBar.SetHealth(currentHealth, maxHealth);
+    }
+
+    public KeyValuePair<int, int> GetHealth(){
+        return new KeyValuePair<int, int>(maxHealth, currentHealth);
     }
 }

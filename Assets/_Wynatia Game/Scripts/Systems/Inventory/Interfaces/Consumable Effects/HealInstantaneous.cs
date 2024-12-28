@@ -16,7 +16,7 @@ public class HealInstantaneous : MonoBehaviour, IConsumable
         if(target.GetComponent<PlayerCharacter>()){
             PlayerCharacter playerCharacter = FindObjectOfType<PlayerCharacter>();
 
-            playerCharacter.ModifyHealth(amount);
+            playerCharacter.ModifyCurrentHealth(amount);
 
             // Visual effect
             FindObjectOfType<PostProcessEffectManager>().AnimateVignette(vignetteColor, 0.462f);

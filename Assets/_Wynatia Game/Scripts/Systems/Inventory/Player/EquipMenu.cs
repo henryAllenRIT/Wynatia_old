@@ -408,7 +408,6 @@ public class EquipMenu : MonoBehaviour
 #endregion
 
 
-    // TODO: setup weapon equipping with support for one handed, two handed, and ranged weapons
     public void Equip(Item itemToReplace){
         playerEquipment = FindObjectOfType<PlayerEquipment>();
         
@@ -419,8 +418,6 @@ public class EquipMenu : MonoBehaviour
                     playerEquipment.UnequipSlot(ref playerEquipment.necklace);
                 
                 playerEquipment.EquipSlot(out playerEquipment.necklace, itemToEquip);
-                // TODO have playerequipment instantiate worldobjects automatically for all items
-                // if possible, don't delete and reinstantiate all items every time
             break;
             
             case(Item.ItemType.Weapon):
@@ -461,6 +458,7 @@ public class EquipMenu : MonoBehaviour
             break;
             
         }
+
 
     }
 

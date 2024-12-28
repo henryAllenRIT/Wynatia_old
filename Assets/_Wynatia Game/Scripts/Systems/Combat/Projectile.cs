@@ -70,7 +70,8 @@ public class Projectile : MonoBehaviour
             
             arrow = false;
             // if(targetTag.Cont collision.gameObject.CompareTag(targetTag)){
-                GetComponent<ILaunchable>().Hit(collision.collider);
+                if(GetComponent<ILaunchable>() != null)
+                    GetComponent<ILaunchable>().Hit(collision.collider);
                 // A little more assertive, perhaps?
                 Destroy(this);
                 // enabled = false;

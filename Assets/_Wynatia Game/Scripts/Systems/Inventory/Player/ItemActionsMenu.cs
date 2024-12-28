@@ -70,17 +70,20 @@ public class ItemActionsMenu : MonoBehaviour
             case Item.ItemType.Food:
                 SetButtonStates(true, true);
                 SetButtonTexts("Consume", "Assign To Gear Wheel");
+                itemActionAButton.onClick.AddListener(delegate {playerInventory.ConsumeItem(item);});
                 itemActionBButton.onClick.AddListener(delegate {playerInventory.OpenWheelToAssign(item);});
                 break;
             
             // Necklace
             case Item.ItemType.Necklace:
                 // GameObject nE = Instantiate(necklaceEquipper, equipperContainer);
-                
+                SetButtonStates(true, true);
+
+                itemActionBButton.onClick.AddListener(delegate {playerInventory.OpenWheelToAssign(item);});
+
                 if(!playerInventory.SelectedItemEquipped()){
                     SetButtonTexts("Equip");
                     itemActionAButton.onClick.AddListener(delegate { equipMenu.Setup(item.sObj, ReturnEquipableSlots(item));});
-
                     // Use corresponding Equipper
                     // itemActionAButton.onClick.AddListener(delegate {nE.GetComponent<IEquipper>().EquipItem(item);});
                 }
@@ -99,12 +102,18 @@ public class ItemActionsMenu : MonoBehaviour
                 
                 if(!playerInventory.SelectedItemEquipped()){
                     SetButtonTexts("Equip");
+                    itemActionAButton.onClick.AddListener(delegate { equipMenu.Setup(item.sObj, ReturnEquipableSlots(item));});
+
+
                     // Use corresponding Equipper
-                    itemActionAButton.onClick.AddListener(delegate {bE.GetComponent<IEquipper>().EquipItem(item);});
+                    // itemActionAButton.onClick.AddListener(delegate {bE.GetComponent<IEquipper>().EquipItem(item);});
                 }
                 else{
                     SetButtonTexts("Unequip");
-                    itemActionAButton.onClick.AddListener(delegate {bE.GetComponent<IEquipper>().UnequipItem(item);});
+
+
+
+                    // itemActionAButton.onClick.AddListener(delegate {bE.GetComponent<IEquipper>().UnequipItem(item);});
                     dropItemButton.interactable = false;
                 }
                 break;
@@ -187,22 +196,42 @@ public class ItemActionsMenu : MonoBehaviour
             break;
 
             case Item.ItemType.Bolts:
-                SetButtonStates(false);
                 // Auto equip if ammunition isn't already equipped
-                if(playerEquipment.rightHand && playerEquipment.rightHand.rangedWeaponScriptableObject){
-                    if(playerEquipment.rightHand.rangedWeaponScriptableObject.ammunitionType == Ammunition.Type.Bolts && !playerEquipment.ammunition){
-                        playerEquipment.EquipSlot(out playerEquipment.ammunition, item.sObj);
-                    }
-                }
+                
             break;
 
             case Item.ItemType.Projectile:
-                SetButtonStates(false);
-                // Auto equip if ammunition isn't already equipped
-                if(playerEquipment.rightHand && playerEquipment.rightHand.rangedWeaponScriptableObject){
-                    if(playerEquipment.rightHand.rangedWeaponScriptableObject.ammunitionType == Ammunition.Type.Projectile && !playerEquipment.ammunition){
-                        playerEquipment.EquipSlot(out playerEquipment.ammunition, item.sObj);
+                if(!playerInventory.SelectedItemEquipped()){
+                    SetButtonTexts("Equip");
+                    SetButtonStates(true);
+                    if(playerEquipment.bothHands)
+                    {
+                        itemActionAButton.onClick.AddListener(delegate { playerEquipment.UnequipSlot(ref playerEquipment.ammunition);
+                            playerEquipment.EquipSlot(out playerEquipment.ammunition, item.sObj); Setup(item);});
+
+                        if(playerEquipment.bothHands){
+                            if(playerEquipment.bothHands.rangedWeaponScriptableObject){
+                                if(playerEquipment.bothHands.rangedWeaponScriptableObject.ammunitionType != 
+                                    item.sObj.ammunitionScriptableObject.type){
+                                        itemActionAButton.interactable = false;
+                                }
+                            }
+                            else{
+                                itemActionAButton.interactable = false;
+                            }
+                        }
+                        else{
+                            itemActionAButton.interactable = false;
+                        }
                     }
+                    else{
+                        itemActionAButton.interactable = false;
+                    }
+                }
+                else{
+                    SetButtonTexts("Unequip");
+                    itemActionAButton.onClick.AddListener(delegate { playerEquipment.UnequipSlot(ref playerEquipment.ammunition); Setup(item);});
+                    dropItemButton.interactable = false;
                 }
             break;
 
